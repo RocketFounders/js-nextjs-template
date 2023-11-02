@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  template_client:
+    build: .
+    container_name: template_client
+    ports:
+      - "3000:3000"
+    restart: always
