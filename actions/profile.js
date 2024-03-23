@@ -3,6 +3,14 @@ import {INITIAL_STATE, state} from "@/store";
 
 
 const profileActions = {
+    getAllProfiles: async (token) => {
+        const [profiles, error] = await profileService.getAllProfiles(token);
+        if (error) {
+            throw new Error(error);
+        }
+        state.allProfiles = profiles;
+        return profiles;
+    },
     getProfile: async (token) => {
         if (!token) {
             const profileDetail = INITIAL_STATE.profileDetail;
@@ -14,6 +22,13 @@ const profileActions = {
             throw new Error(error);
         }
         profileActions.setProfile(profile);
+        return profile;
+    },
+    update: async (payload, token) => {
+        const [profile, error] = await profileService.update(payload, token);
+        if (error) {
+            throw new Error(error);
+        }
         return profile;
     },
     authProfile: async (payload) => {
@@ -28,9 +43,9 @@ const profileActions = {
             "username": profile.username,
             "password": profile.password,
             "email": profile.email,
-            "phone_number": profile.phoneNumber,
-            "first_name": profile.firstName,
-            "last_name": profile.lastName,
+            "phoneNumber": profile.phoneNumber,
+            "firstName": profile.firstName,
+            "lastName": profile.lastName,
             "photo_url": null
         };
 
@@ -41,8 +56,8 @@ const profileActions = {
         return token;
     },
 
-    logoutProfile: async () => {
-        const [status, error] = await profileService.logoutProfile();
+    logoutProfile: async (token) => {
+        const [status, error] = await profileService.logoutProfile(token);
         if (error) {
             throw new Error(error);
         }

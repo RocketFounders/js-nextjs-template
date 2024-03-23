@@ -1,56 +1,50 @@
-"use client"
-
+"use server";
 import {Navbar} from "@/components/common/Navbar";
 import {Footer} from "@/components/common/Footer";
-import {resetStore, useProfileDetail} from "@/store";
-import {useEffect, useState} from "react";
-import {useRouter} from "next/navigation";
-import {isValidToken} from "@/utils/profile";
-import profileActions from "@/actions/profile";
+import profileService from "@/services/profile";
+import {cookies} from 'next/headers';
+import {redirect} from 'next/navigation';
 
-export default function BaseLayout(props) {
-    const {
-        children,
-        navbarOn,
-        footerOn,
-        authLayoutOn
-    } = props;
+export default async function BaseLayout({
+                                             Component,
+                                             navbarOn,
+                                             footerOn,
+                                             pageProps,
+                                             redirectCondition,
+                                             redirectUrl
+                                         }) {
 
-    const router = useRouter();
-    const profile = useProfileDetail();
-    const [hasProfile, setHasProfile] = useState(!!profile && !!profile.id);
+    let hasProfile = false;
+    let profile = null;
+    const cookieStore = cookies();
 
-    const getProfile = async (token) => {
+    const getCurrentProfile = async (token) => {
         try {
-            profileActions.getProfile(token).then(profileDetail => {
-                setHasProfile(!!profileDetail && !!profileDetail.id)
-            });
+            const [data, error] = await profileService.getProfile(token)
+            if (data?.id) {
+                hasProfile = true;
+                profile = data;
+            }
+
         } catch (e) {
-            setHasProfile(false)
             console.log(e);
         }
     }
 
-    useEffect(() => {
-        const token = localStorage.getItem('jwt-token');
+    if (cookieStore.has("jwtToken") && !hasProfile) {
+        const token = cookieStore.get("jwtToken");
+        await getCurrentProfile(token.value);
+    }
 
-        if (!hasProfile) {
-            getProfile(token).then();
-        }
-
-        if (authLayoutOn && (!token || !isValidToken(token))) {
-            localStorage.removeItem('jwt-token');
-            resetStore();
-            router.push('/login');
-        }
-
-    }, [hasProfile, profile])
+    if (redirectUrl && redirectCondition && redirectCondition(hasProfile, profile)) {
+        redirect(redirectUrl)
+    }
 
     return (
         <main>
-            {navbarOn && <Navbar profile={profile}/>}
-            {children}
-            {footerOn && <Footer/>}
+            {navbarOn && <Navbar hasProfile={hasProfile} profile={profile}/>}
+            {!!Component ? <Component hasProfile={hasProfile} profile={profile} {...pageProps}/> : null}
+            {footerOn && <Footer hasProfile={hasProfile}/>}
         </main>
     )
 }

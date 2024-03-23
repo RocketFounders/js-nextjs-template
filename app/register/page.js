@@ -1,10 +1,10 @@
 import Register from "@/components/pages/register/Register";
 import BaseLayout from "@/components/common/BaseLayout";
 
-const Page = () => {
-    return <BaseLayout navbarOn={true} footerOn={true} authLayoutOn={false}>
-        <Register/>
-    </BaseLayout>
+export default function Page() {
+    return <BaseLayout Component={Register} navbarOn footerOn
+                       redirectCondition={(hasProfile, profile) => hasProfile}
+                       redirectUrl={"/"}
+    />
 };
 
-export default Page;

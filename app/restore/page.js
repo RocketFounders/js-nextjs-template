@@ -1,9 +1,12 @@
 import BaseLayout from "@/components/common/BaseLayout";
+import {Restore} from "@/components/pages/restore/Restore";
 
-const Page = () => {
-    return <BaseLayout navbarOn={true} footerOn={true} authLayoutOn={false}>
-        Restore
-    </BaseLayout>
+export default function Page() {
+    return <BaseLayout Component={Restore}
+                       redirectCondition={(hasProfile, profile) => hasProfile}
+                       redirectUrl={"/"}
+                       navbarOn
+                       footerOn
+    />
 };
 
-export default Page;

@@ -3,6 +3,28 @@ import axiosInstance from "../plugins/axios";
 
 const profileService = {
 
+    getAllProfiles: async (token) => {
+        try {
+            axiosInstance.defaults.headers['Authorization'] = `Bearer ${token}`;
+            const {data} = await axiosInstance.get(`/profile/all`);
+            return [data, null];
+        } catch (error) {
+            return [null, error];
+        }
+    },
+
+    update: async (payload, token) => {
+        try {
+            axiosInstance.defaults.headers['Authorization'] = `Bearer ${token}`;
+            const config = {headers: {'Content-Type': 'application/json'}};
+            const {data} = await axiosInstance.post(`/profile/update`, payload, config);
+            return [data, null];
+        } catch (error) {
+            return [null, error];
+        }
+    },
+
+
     getProfile: async (token) => {
         try {
             axiosInstance.defaults.headers['Authorization'] = `Bearer ${token}`;
@@ -30,8 +52,9 @@ const profileService = {
             return [null, error];
         }
     },
-    logoutProfile: async () => {
+    logoutProfile: async (token) => {
         try {
+            axiosInstance.defaults.headers['Authorization'] = `Bearer ${token}`;
             const {data} = await axiosInstance.post(`/profile/logout`);
             return [data, null];
         } catch (error) {

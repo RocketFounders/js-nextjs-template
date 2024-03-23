@@ -5,19 +5,23 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {AuthProfileSchema} from "@/schemas/profile";
 import profileActions from "@/actions/profile";
+import {useCookies} from "next-client-cookies";
 
 export function Login() {
     const router = useRouter();
+    const cookie = useCookies();
     const formik = useFormik({
         initialValues: {
             username: undefined,
             password: undefined,
         },
         onSubmit: values => profileActions.authProfile(values).then(token => {
-            localStorage.setItem('jwt-token', token?.accessToken);
-            profileActions.getProfile(token?.accessToken).then(profile => {
+            cookie.set("jwtToken", token?.access_token)
+            profileActions.getProfile(token?.access_token).then(profile => {
                 router.push('/');
+                router.refresh();
             })
+
         }),
         validationSchema: AuthProfileSchema,
         validateOnChange: false

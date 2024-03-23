@@ -76,6 +76,19 @@
     background-repeat: no-repeat;
 }
 
+.profile-card {
+    padding: 20px 10px;
+    border-radius: 10px;
+    max-width: 500px;
+    border: 1px solid black;
+}
+
+.profile-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 20px;
+}
+
 
 /*====================Login page====================*/
 
